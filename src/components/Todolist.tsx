@@ -8,7 +8,6 @@ interface Task {
 
 const Todolist: FunctionComponent = () => {
     const [task, setTask] = useState<Task[]>([]);
-    const [completedTask, setCompletedTask] = useState<Task[]>([]);
     const [newTask, setNewTask] = useState<string>("");
 
     const addTask = (newTask: string) => {
@@ -27,35 +26,23 @@ const Todolist: FunctionComponent = () => {
         setTask(() => task.filter(task => task.id != taskId));
     }
 
-    const completeTask = (completedTask: Task) => {
-        setTask(() => task.filter(task => task.id != completedTask.id))
-        setCompletedTask((prevCompletedTask) => {
-            const lastId = prevCompletedTask.length - 1;
-            return [...prevCompletedTask, {
-                id: lastId + 1,
-                text: completedTask.text,
-                completed: true
-            }]
-        })
-    }
+    const completeTask = (taskId : number) => {
+        setTask(() => task.map(task => {
+            if (task.id === taskId) {
+                return {...task, completed: !task.completed}
+            }
+            return task;
+        }))
 
-    console.log(task);
+    }
 
     return (
         <>
         <div><ul>{task.map((task) => 
-            <li key={task.id}>{task.text}  <button onClick={() => deleteTask(task.id)}>Delete</button> <button onClick={() => completeTask(task)}>Complete</button></li>)}
+            <li key={task.id}>{task.text}  <button onClick={() => deleteTask(task.id)}>Delete</button> <input type="checkbox" onChange={() => completeTask(task.id)}></input> </li>)}
             </ul>
             <input type="text" placeholder="New task" value={newTask} onChange={(e) => setNewTask(() => e.target.value)}></input>
             <button onClick={() => addTask(newTask)}>Submit</button>
-        </div>
-        <div>
-            <h1>Completed</h1>
-            <ul>
-                {completedTask.map((task) => 
-                <li key={task.id}>{task.text}</li>
-                )}
-            </ul>
         </div>
         </>
     )
